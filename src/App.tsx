@@ -1,14 +1,37 @@
-import { Button } from './components/ui/button'
-import './index.css';
-
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { Toaster } from "sonner";
+import { ThemeProvider } from "@/components/context/ThemeContext";
+import { AuthProvider } from "@/context/AuthContext";
+import { Header } from "@/components/layout/Header";
+import { Footer } from "@/components/layout/Footer";
+import { LoginPage } from "@/pages/auth/LoginPage";
+import { RegisterPage } from "@/pages/auth/RegisterPage";
+import { DashboardPage } from "@/pages/DashboardPage";
+import "./index.css";
 
 function App() {
-
   return (
-    <div className="min-h-full flex items-center justify-center">
-        <Button>Alhamdulillah</Button>
-      </div>
-  )
+    <ThemeProvider>
+      <AuthProvider>
+        <BrowserRouter>
+          <div className="min-h-screen flex flex-col">
+            <Header />
+            <div className="flex-1">
+              <Routes>
+                <Route path="/" element={<DashboardPage />} />
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/register" element={<RegisterPage />} />
+                {/* redirect unkown routes to home */}
+                <Route path="*" element={<Navigate to="/" replace />} />
+              </Routes>
+            </div>
+            <Footer />
+          </div>
+          <Toaster position="top-right" richColors />
+        </BrowserRouter>
+      </AuthProvider>
+    </ThemeProvider>
+  );
 }
 
-export default App
+export default App;
