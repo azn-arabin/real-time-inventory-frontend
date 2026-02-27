@@ -2,9 +2,9 @@
 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
+import { Controller } from "react-hook-form";
+import type {
   Control,
-  Controller,
   FieldError,
   FieldValues,
   RegisterOptions,
@@ -21,7 +21,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Matcher } from "react-day-picker";
+import type { Matcher } from "react-day-picker";
 import { Calendar } from "@/components/ui/calendar";
 import {
   Tooltip,

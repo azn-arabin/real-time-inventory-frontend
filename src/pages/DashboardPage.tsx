@@ -3,7 +3,7 @@ import { toast } from "sonner";
 import { DropCard } from "@/components/drops/DropCard";
 import { dropsApi } from "@/services/api";
 import { useSocket } from "@/hooks/useSocket";
-import { Drop, Reservation } from "@/types";
+import type { Drop, Reservation } from "@/types";
 import { useAuth } from "@/context/AuthContext";
 import { CreateDropModal } from "@/components/drops/CreateDropModal";
 import { Loader2, RefreshCw } from "lucide-react";
