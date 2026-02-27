@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import { ModeToggle } from "@/components/common/ThemeToggle";
-import { useAuth } from "@/context/AuthContext";
+import { useAuth } from "@/lib/context/AuthContext";
 import { Button } from "@/components/ui/button";
 import { ShoppingBag, LogOut, User } from "lucide-react";
 
@@ -15,7 +15,7 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50 border-b bg-background/80 backdrop-blur">
-      <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
+      <div className="lg:px-16 md:px-12 px-4 h-14 flex items-center justify-between">
         <Link
           to="/"
           className="flex items-center gap-2 font-bold text-lg tracking-tight"

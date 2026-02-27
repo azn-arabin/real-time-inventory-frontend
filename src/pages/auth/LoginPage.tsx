@@ -5,13 +5,14 @@ import { toast } from "sonner";
 import { FormInputWithLabel } from "@/components/form/FormComponents";
 import { PasswordInputWithLabel } from "@/components/form/PasswordsInput";
 import { Button } from "@/components/common/Buttons";
-import { useAuth } from "@/context/AuthContext";
+import { useAuth } from "@/lib/context/AuthContext";
 import { authApi } from "@/services/api";
+import { PageContainer } from "@/components/common/PageComponents";
 
-type LoginForm = {
+interface LoginForm {
   email: string;
   password: string;
-};
+}
 
 export function LoginPage() {
   const { login } = useAuth();
@@ -42,8 +43,8 @@ export function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4">
-      <div className="w-full max-w-sm space-y-6">
+    <PageContainer className="items-center justify-center">
+      <div className="w-full p-8 rounded-md bg-accent max-w-sm space-y-6">
         <div className="text-center">
           <h1 className="text-2xl font-bold">Sign in</h1>
           <p className="text-sm text-muted-foreground mt-1">
@@ -84,6 +85,6 @@ export function LoginPage() {
           </Link>
         </p>
       </div>
-    </div>
+    </PageContainer>
   );
 }

@@ -5,8 +5,9 @@ import { toast } from "sonner";
 import { FormInputWithLabel } from "@/components/form/FormComponents";
 import { PasswordInputWithLabel } from "@/components/form/PasswordsInput";
 import { Button } from "@/components/common/Buttons";
-import { useAuth } from "@/context/AuthContext";
+import { useAuth } from "@/lib/context/AuthContext";
 import { authApi } from "@/services/api";
+import { PageContainer } from "@/components/common/PageComponents";
 
 type RegisterForm = {
   username: string;
@@ -43,8 +44,8 @@ export function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4">
-      <div className="w-full max-w-sm space-y-6">
+    <PageContainer className="justify-center items-center">
+      <div className="w-full p-8 bg-accent rounded-md max-w-sm space-y-6">
         <div className="text-center">
           <h1 className="text-2xl font-bold">Create account</h1>
           <p className="text-sm text-muted-foreground mt-1">
@@ -100,6 +101,6 @@ export function RegisterPage() {
           </Link>
         </p>
       </div>
-    </div>
+    </PageContainer>
   );
 }

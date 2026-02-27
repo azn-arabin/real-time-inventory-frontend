@@ -1,4 +1,4 @@
-import { useCountdown } from "@/hooks/useCountdown";
+import { useCountdown } from "@/lib/hooks/useCountdown";
 import { cn } from "@/lib/utils";
 import { Clock } from "lucide-react";
 

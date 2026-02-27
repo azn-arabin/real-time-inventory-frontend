@@ -7,8 +7,7 @@ import { type VariantProps } from "class-variance-authority";
 import * as React from "react";
 
 export interface ButtonProps
-  extends React.ComponentProps<"button">,
-    VariantProps<typeof buttonVariants> {
+  extends React.ComponentProps<"button">, VariantProps<typeof buttonVariants> {
   loading?: boolean;
   children: React.ReactNode;
   asChild?: boolean;
@@ -23,7 +22,7 @@ export const Button = ({
   return (
     <ShadButton
       disabled={loading || disabled}
-      className={cn("flex items-center gap-2", className)}
+      className={cn("flex items-center gap-2 cursor-pointer", className)}
       {...props}
     >
       {loading && <Loader2 className="animate-spin h-4 w-4" />}

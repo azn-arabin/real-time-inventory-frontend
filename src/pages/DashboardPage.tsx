@@ -2,13 +2,14 @@ import { useEffect, useState, useCallback } from "react";
 import { toast } from "sonner";
 import { DropCard } from "@/components/drops/DropCard";
 import { dropsApi } from "@/services/api";
-import { useSocket } from "@/hooks/useSocket";
-import type { Drop, Reservation } from "@/types";
-import { useAuth } from "@/context/AuthContext";
+import { useSocket } from "@/lib/hooks/useSocket";
+import type { Drop, Reservation } from "@/lib/types";
+import { useAuth } from "@/lib/context/AuthContext";
 import { CreateDropModal } from "@/components/drops/CreateDropModal";
 import { Loader2, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { reservationsApi } from "@/services/api";
+import { PageContainer } from "@/components/common/PageComponents";
 
 export function DashboardPage() {
   const { isAdmin, isAuthenticated } = useAuth();
@@ -48,9 +49,7 @@ export function DashboardPage() {
   useSocket({
     onStockUpdate: ({ dropId, availableStock }) => {
       setDrops((prev) =>
-        prev.map((d) =>
-          d.id === dropId ? { ...d, availableStock } : d
-        )
+        prev.map((d) => (d.id === dropId ? { ...d, availableStock } : d)),
       );
     },
     onPurchaseMade: ({ username, dropId }) => {
@@ -59,15 +58,13 @@ export function DashboardPage() {
       dropsApi.getDrop(dropId).then((res) => {
         const updated = res.data.data;
         setDrops((prev) =>
-          prev.map((d) => (d.id === dropId ? { ...d, ...updated } : d))
+          prev.map((d) => (d.id === dropId ? { ...d, ...updated } : d)),
         );
       });
     },
     onReservationExpired: ({ dropId, availableStock }) => {
       setDrops((prev) =>
-        prev.map((d) =>
-          d.id === dropId ? { ...d, availableStock } : d
-        )
+        prev.map((d) => (d.id === dropId ? { ...d, availableStock } : d)),
       );
       // if the current user's reservation expired, clear it
       if (reservation?.dropId === dropId) {
@@ -92,7 +89,7 @@ export function DashboardPage() {
   };
 
   return (
-    <main className="max-w-6xl mx-auto px-4 py-8">
+    <PageContainer>
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold">Live Drops</h1>
@@ -105,15 +102,16 @@ export function DashboardPage() {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => { setLoading(true); fetchDrops(); }}
+            onClick={() => {
+              setLoading(true);
+              fetchDrops();
+            }}
           >
             <RefreshCw className="h-4 w-4 mr-1" />
             Refresh
           </Button>
 
-          {isAdmin && (
-            <CreateDropModal onCreated={handleDropCreated} />
-          )}
+          {isAdmin && <CreateDropModal onCreated={handleDropCreated} />}
         </div>
       </div>
 
@@ -126,7 +124,7 @@ export function DashboardPage() {
           No drops available right now. Check back soon!
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {drops.map((drop) => (
             <DropCard
               key={drop.id}
@@ -138,6 +136,6 @@ export function DashboardPage() {
           ))}
         </div>
       )}
-    </main>
+    </PageContainer>
   );
 }

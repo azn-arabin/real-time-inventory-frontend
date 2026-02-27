@@ -5,8 +5,8 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/common/Buttons";
 import { Separator } from "@/components/ui/separator";
 import { ReservationCountdown } from "./ReservationCountdown";
-import type { Drop, Reservation } from "@/types";
-import { useAuth } from "@/context/AuthContext";
+import type { Drop, Reservation } from "@/lib/types";
+import { useAuth } from "@/lib/context/AuthContext";
 import { reservationsApi, purchasesApi } from "@/services/api";
 import { ShoppingCart, Trophy, Package } from "lucide-react";
 

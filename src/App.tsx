@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { Toaster } from "sonner";
-import { ThemeProvider } from "@/components/context/ThemeContext";
-import { AuthProvider } from "@/context/AuthContext";
+import { ThemeProvider } from "@/lib/context/ThemeContext";
+import { AuthProvider } from "@/lib/context/AuthContext";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { LoginPage } from "@/pages/auth/LoginPage";
@@ -16,7 +16,7 @@ function App() {
         <BrowserRouter>
           <div className="min-h-screen flex flex-col">
             <Header />
-            <div className="flex-1">
+            <div className="flex-1 flex flex-col">
               <Routes>
                 <Route path="/" element={<DashboardPage />} />
                 <Route path="/login" element={<LoginPage />} />
