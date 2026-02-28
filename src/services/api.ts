@@ -51,6 +51,7 @@ export const reservationsApi = {
 export const purchasesApi = {
   completePurchase: (reservationId: string) =>
     api.post("/purchases", { reservationId }),
+  getMyPurchases: () => api.get("/purchases/mine"),
 };
 
 export default api;

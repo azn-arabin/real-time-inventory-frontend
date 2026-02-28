@@ -8,7 +8,7 @@ export interface Drop {
   availableStock: number;
   imageUrl?: string;
   dropStartsAt: string;
-  topPurchasers?: { username: string }[];
+  topPurchasers?: { username: string; purchasedAt?: string }[];
 }
 
 export interface Reservation {
@@ -25,4 +25,11 @@ export interface Purchase {
   userId: string;
   dropId: string;
   reservationId: string;
+  createdAt: string;
+  Drop?: {
+    id: string;
+    name: string;
+    price: number;
+    imageUrl?: string;
+  };
 }

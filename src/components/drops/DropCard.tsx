@@ -15,9 +15,16 @@ interface Props {
   reservation: Reservation | null; // user's current reservation for this drop
   onReserved: (res: Reservation) => void;
   onPurchased: () => void;
+  onReservationExpired?: () => void;
 }
 
-export function DropCard({ drop, reservation, onReserved, onPurchased }: Props) {
+export function DropCard({
+  drop,
+  reservation,
+  onReserved,
+  onPurchased,
+  onReservationExpired,
+}: Props) {
   const { isAuthenticated } = useAuth();
   const [reserving, setReserving] = useState(false);
   const [purchasing, setPurchasing] = useState(false);
@@ -35,10 +42,16 @@ export function DropCard({ drop, reservation, onReserved, onPurchased }: Props) 
     setReserving(true);
     try {
       const res = await reservationsApi.reserve(drop.id);
-      onReserved(res.data.data);
+      // backend wraps like { reservation: {...}, availableStock }
+      const resData = res.data.data;
+      onReserved(resData.reservation || resData);
       toast.success("Item reserved! You have 60 seconds to complete purchase.");
     } catch (err: any) {
-      const msg = err?.response?.data?.message || "Could not reserve item";
+      const errData = err?.response?.data;
+      const msg =
+        errData?.message ||
+        errData?.errors?.common?.msg ||
+        "Could not reserve item";
       toast.error(msg);
     } finally {
       setReserving(false);
@@ -53,7 +66,9 @@ export function DropCard({ drop, reservation, onReserved, onPurchased }: Props) 
       onPurchased();
       toast.success("Purchase complete! Enjoy your sneakers 🎉");
     } catch (err: any) {
-      const msg = err?.response?.data?.message || "Purchase failed";
+      const errData = err?.response?.data;
+      const msg =
+        errData?.message || errData?.errors?.common?.msg || "Purchase failed";
       toast.error(msg);
     } finally {
       setPurchasing(false);
@@ -64,8 +79,8 @@ export function DropCard({ drop, reservation, onReserved, onPurchased }: Props) 
     drop.availableStock <= 5
       ? "destructive"
       : drop.availableStock <= 20
-      ? "secondary"
-      : "default";
+        ? "secondary"
+        : "default";
 
   return (
     <Card className="flex flex-col overflow-hidden">
@@ -113,6 +128,7 @@ export function DropCard({ drop, reservation, onReserved, onPurchased }: Props) 
             <ReservationCountdown
               expiresAt={reservation.expiresAt}
               className="w-full justify-center"
+              onExpired={onReservationExpired}
             />
             <Button
               className="w-full"

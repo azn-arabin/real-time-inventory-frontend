@@ -7,6 +7,7 @@ import { Footer } from "@/components/layout/Footer";
 import { LoginPage } from "@/pages/auth/LoginPage";
 import { RegisterPage } from "@/pages/auth/RegisterPage";
 import { DashboardPage } from "@/pages/DashboardPage";
+import { MyPurchasesPage } from "@/pages/MyPurchasesPage";
 import "./index.css";
 
 function App() {
@@ -19,6 +20,7 @@ function App() {
             <div className="flex-1 flex flex-col">
               <Routes>
                 <Route path="/" element={<DashboardPage />} />
+                <Route path="/my-purchases" element={<MyPurchasesPage />} />
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/register" element={<RegisterPage />} />
                 {/* redirect unkown routes to home */}

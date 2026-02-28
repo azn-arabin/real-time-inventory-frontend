@@ -3,13 +3,26 @@ import { io, Socket } from "socket.io-client";
 
 const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || "http://localhost:5000";
 
-// single socket instance shared across the app
+// single shared socket instace for the whole app
 let socketInstance: Socket | null = null;
 
 export function getSocket(): Socket {
   if (!socketInstance) {
     socketInstance = io(SOCKET_URL, {
-      transports: ["websocket"],
+      transports: ["websocket", "polling"],
+      reconnectionAttempts: 10,
+      reconnectionDelay: 2000,
+    });
+
+    // some basic loging so we can debug connection issues easier
+    socketInstance.on("connect", () => {
+      console.log("socket connected:", socketInstance?.id);
+    });
+    socketInstance.on("connect_error", (err) => {
+      console.warn("socket connection error:", err.message);
+    });
+    socketInstance.on("disconnect", (reason) => {
+      console.log("socket disconnected:", reason);
     });
   }
   return socketInstance;
@@ -26,7 +39,9 @@ export type PurchaseMadePayload = {
 };
 
 export type ReservationExpiredPayload = {
+  reservationId: string;
   dropId: string;
+  userId: string;
   availableStock: number;
 };
 

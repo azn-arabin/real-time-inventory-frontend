@@ -2,7 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { ModeToggle } from "@/components/common/ThemeToggle";
 import { useAuth } from "@/lib/context/AuthContext";
 import { Button } from "@/components/ui/button";
-import { ShoppingBag, LogOut, User } from "lucide-react";
+import { ShoppingBag, LogOut, User, Package } from "lucide-react";
 
 export function Header() {
   const { user, logout, isAuthenticated } = useAuth();
@@ -29,6 +29,12 @@ export function Header() {
 
           {isAuthenticated ? (
             <>
+              <Button variant="ghost" size="sm" asChild>
+                <Link to="/my-purchases">
+                  <Package className="h-4 w-4 mr-1" />
+                  My Purchases
+                </Link>
+              </Button>
               <span className="text-sm text-muted-foreground flex items-center gap-1">
                 <User className="h-4 w-4" />
                 {user?.username}

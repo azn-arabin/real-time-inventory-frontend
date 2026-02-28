@@ -12,7 +12,7 @@ import { reservationsApi } from "@/services/api";
 import { PageContainer } from "@/components/common/PageComponents";
 
 export function DashboardPage() {
-  const { isAdmin, isAuthenticated } = useAuth();
+  const { user, isAdmin, isAuthenticated } = useAuth();
   const [drops, setDrops] = useState<Drop[]>([]);
   const [loading, setLoading] = useState(true);
   // user's current active reservation (one per user at a time)
@@ -33,9 +33,19 @@ export function DashboardPage() {
     if (!isAuthenticated) return;
     try {
       const res = await reservationsApi.getMyReservation();
-      setReservation(res.data.data || null);
+      const data = res.data.data;
+      // if the reservation came back but its already expired, just ignore it
+      if (
+        data &&
+        data.status === "active" &&
+        new Date(data.expiresAt) > new Date()
+      ) {
+        setReservation(data);
+      } else {
+        setReservation(null);
+      }
     } catch {
-      // no active reservation is fine, just ignore 404
+      // 404 means no active reservation, thats fine
       setReservation(null);
     }
   }, [isAuthenticated]);
@@ -62,12 +72,13 @@ export function DashboardPage() {
         );
       });
     },
-    onReservationExpired: ({ dropId, availableStock }) => {
+    onReservationExpired: ({ dropId, userId, availableStock }) => {
+      // update stock count on the card
       setDrops((prev) =>
         prev.map((d) => (d.id === dropId ? { ...d, availableStock } : d)),
       );
-      // if the current user's reservation expired, clear it
-      if (reservation?.dropId === dropId) {
+      // only clear reservaton if its the current user's one that expired
+      if (user && userId === user.id && reservation?.dropId === dropId) {
         setReservation(null);
         toast.warning("Your reservation expired!");
       }
@@ -81,6 +92,13 @@ export function DashboardPage() {
   const handlePurchased = () => {
     setReservation(null);
     fetchDrops();
+  };
+
+  // called when the client side timer hits 0
+  const handleLocalExpiry = () => {
+    setReservation(null);
+    toast.warning("Your reservation expired!");
+    fetchDrops(); // refetch so stock shows updated
   };
 
   const handleDropCreated = () => {
@@ -132,6 +150,7 @@ export function DashboardPage() {
               reservation={reservation}
               onReserved={handleReserved}
               onPurchased={handlePurchased}
+              onReservationExpired={handleLocalExpiry}
             />
           ))}
         </div>
