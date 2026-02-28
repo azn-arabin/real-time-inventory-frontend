@@ -85,12 +85,12 @@ export function DropCard({
   return (
     <Card className="flex flex-col overflow-hidden">
       {/* product image or placeholder */}
-      <div className="relative bg-muted aspect-video flex items-center justify-center">
+      <div className="relative bg-muted h-52 flex items-center justify-center overflow-hidden">
         {drop.imageUrl ? (
           <img
             src={drop.imageUrl}
             alt={drop.name}
-            className="object-cover w-full h-full"
+            className="object-cover object-center w-full h-full"
           />
         ) : (
           <Package className="h-16 w-16 text-muted-foreground opacity-40" />
@@ -104,13 +104,13 @@ export function DropCard({
         <h3 className="font-semibold text-base leading-tight">{drop.name}</h3>
         <p className="text-xl font-bold">${Number(drop.price).toFixed(2)}</p>
 
-        {/* top 3 buyers */}
-        {drop.topPurchasers && drop.topPurchasers.length > 0 && (
-          <div className="pt-1">
-            <Separator className="mb-2" />
-            <p className="text-xs text-muted-foreground flex items-center gap-1 mb-1">
-              <Trophy className="h-3 w-3" /> Top buyers
-            </p>
+        {/* top 3 buyers - always rendered so card height stays consistent */}
+        <div className="pt-1">
+          <Separator className="mb-2" />
+          <p className="text-xs text-muted-foreground flex items-center gap-1 mb-1">
+            <Trophy className="h-3 w-3" /> Top buyers
+          </p>
+          {drop.topPurchasers && drop.topPurchasers.length > 0 ? (
             <ul className="space-y-0.5">
               {drop.topPurchasers.map((p, i) => (
                 <li key={i} className="text-xs text-muted-foreground">
@@ -118,8 +118,12 @@ export function DropCard({
                 </li>
               ))}
             </ul>
-          </div>
-        )}
+          ) : (
+            <p className="text-xs text-muted-foreground italic">
+              No purchases yet
+            </p>
+          )}
+        </div>
       </CardContent>
 
       <CardFooter className="flex-col gap-2 pt-0">
