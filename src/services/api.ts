@@ -44,7 +44,7 @@ export const dropsApi = {
 // reservations
 export const reservationsApi = {
   reserve: (dropId: string) => api.post("/reservations", { dropId }),
-  getMyReservation: () => api.get("/reservations"),
+  getMyReservations: () => api.get("/reservations"),
 };
 
 // purchases

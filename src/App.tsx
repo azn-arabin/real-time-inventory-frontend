@@ -4,6 +4,7 @@ import { ThemeProvider } from "@/lib/context/ThemeContext";
 import { AuthProvider } from "@/lib/context/AuthContext";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
+import { GuestRoute } from "@/components/routes/GuestRoute";
 import { LoginPage } from "@/pages/auth/LoginPage";
 import { RegisterPage } from "@/pages/auth/RegisterPage";
 import { DashboardPage } from "@/pages/DashboardPage";
@@ -21,8 +22,10 @@ function App() {
               <Routes>
                 <Route path="/" element={<DashboardPage />} />
                 <Route path="/my-purchases" element={<MyPurchasesPage />} />
-                <Route path="/login" element={<LoginPage />} />
-                <Route path="/register" element={<RegisterPage />} />
+                <Route element={<GuestRoute />}>
+                  <Route path="/login" element={<LoginPage />} />
+                  <Route path="/register" element={<RegisterPage />} />
+                </Route>
                 {/* redirect unkown routes to home */}
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>

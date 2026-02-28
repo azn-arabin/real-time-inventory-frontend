@@ -20,18 +20,17 @@ export function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  // user's current active reservation (one per user at a time)
-  const [reservation, setReservation] = useState<Reservation | null>(null);
+  const [reservations, setReservations] = useState<Record<string, Reservation>>(
+    {},
+  );
 
   const fetchDrops = useCallback(async (pageNum = 1) => {
     setLoading(true);
     try {
       const res = await dropsApi.getDrops(pageNum, DROPS_PER_PAGE);
-      const responseData = res.data.data;
+      const data = res.data.data;
       // backend returns array directly (with meta in seperate field)
-      setDrops(
-        Array.isArray(responseData) ? responseData : responseData?.drops || [],
-      );
+      setDrops(Array.isArray(data) ? data : data?.drops || []);
       const meta = res.data.meta;
       if (meta) {
         setTotalPages(meta.totalPages || 1);
@@ -44,31 +43,28 @@ export function DashboardPage() {
     }
   }, []);
 
-  const fetchMyReservation = useCallback(async () => {
+  const fetchMyReservations = useCallback(async () => {
     if (!isAuthenticated) return;
     try {
-      const res = await reservationsApi.getMyReservation();
-      const data = res.data.data;
-      // if the reservation came back but its already expired, just ignore it
-      if (
-        data &&
-        data.status === "active" &&
-        new Date(data.expiresAt) > new Date()
-      ) {
-        setReservation(data);
-      } else {
-        setReservation(null);
+      const res = await reservationsApi.getMyReservations();
+      const data: Reservation[] = res.data.data || [];
+      // build a map keyed by dropId so each card can look up its own
+      const map: Record<string, Reservation> = {};
+      for (const r of data) {
+        if (r.status === "active" && new Date(r.expiresAt) > new Date()) {
+          map[r.dropId] = r;
+        }
       }
+      setReservations(map);
     } catch {
-      // 404 means no active reservation, thats fine
-      setReservation(null);
+      setReservations({});
     }
   }, [isAuthenticated]);
 
   useEffect(() => {
     fetchDrops(page);
-    fetchMyReservation();
-  }, [fetchDrops, fetchMyReservation]); // eslint-disable-line
+    fetchMyReservations();
+  }, [fetchDrops, fetchMyReservations]); // eslint-disable-line
 
   // listen to realtime stock + purchase events
   useSocket({
@@ -92,10 +88,13 @@ export function DashboardPage() {
       setDrops((prev) =>
         prev.map((d) => (d.id === dropId ? { ...d, availableStock } : d)),
       );
-      // only clear reservaton if its the current user's one that expired
-      if (user && userId === user.id && reservation?.dropId === dropId) {
-        setReservation(null);
-        toast.warning("Your reservation expired!");
+      // clear that specific reservaton if its the current user's
+      if (user && userId === user.id) {
+        setReservations((prev) => {
+          const copy = { ...prev };
+          delete copy[dropId];
+          return copy;
+        });
       }
     },
     onNewDrop: (newDrop) => {
@@ -109,20 +108,27 @@ export function DashboardPage() {
     },
   });
 
-  const handleReserved = (res: Reservation) => {
-    setReservation(res);
+  const handleReserved = (dropId: string, res: Reservation) => {
+    setReservations((prev) => ({ ...prev, [dropId]: res }));
   };
 
-  const handlePurchased = () => {
-    setReservation(null);
-    fetchDrops(page);
+  const handlePurchased = (dropId: string) => {
+    // remove that reservation from the map
+    setReservations((prev) => {
+      const copy = { ...prev };
+      delete copy[dropId];
+      return copy;
+    });
   };
 
   // called when the client side timer hits 0
-  const handleLocalExpiry = () => {
-    setReservation(null);
+  const handleLocalExpiry = (dropId: string) => {
+    setReservations((prev) => {
+      const copy = { ...prev };
+      delete copy[dropId];
+      return copy;
+    });
     toast.warning("Your reservation expired!");
-    fetchDrops(page); // refetch so stock shows updated
   };
 
   const handleDropCreated = () => {
@@ -167,10 +173,10 @@ export function DashboardPage() {
             <DropCard
               key={drop.id}
               drop={drop}
-              reservation={reservation}
-              onReserved={handleReserved}
-              onPurchased={handlePurchased}
-              onReservationExpired={handleLocalExpiry}
+              reservation={reservations[drop.id] || null}
+              onReserved={(res) => handleReserved(drop.id, res)}
+              onPurchased={() => handlePurchased(drop.id)}
+              onReservationExpired={() => handleLocalExpiry(drop.id)}
             />
           ))}
         </div>
