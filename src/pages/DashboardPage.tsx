@@ -83,6 +83,15 @@ export function DashboardPage() {
         toast.warning("Your reservation expired!");
       }
     },
+    onNewDrop: (newDrop) => {
+      // add the new drop to the top of the list in realtime
+      setDrops((prev) => {
+        // dont add duplicate if somehow it already exists
+        if (prev.some((d) => d.id === newDrop.id)) return prev;
+        return [{ ...newDrop, topPurchasers: [] }, ...prev];
+      });
+      toast.info(`New drop just landed: ${newDrop.name}!`, { duration: 4000 });
+    },
   });
 
   const handleReserved = (res: Reservation) => {

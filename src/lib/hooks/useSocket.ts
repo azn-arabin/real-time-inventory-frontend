@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { io, Socket } from "socket.io-client";
+import { SOCKET_EVENTS } from "@/lib/constants/utils.constants";
 
 const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || "http://localhost:5000";
 
@@ -38,6 +39,16 @@ export type PurchaseMadePayload = {
   username: string;
 };
 
+export type NewDropPayload = {
+  id: string;
+  name: string;
+  price: number;
+  totalStock: number;
+  availableStock: number;
+  imageUrl?: string;
+  dropStartsAt: string;
+};
+
 export type ReservationExpiredPayload = {
   reservationId: string;
   dropId: string;
@@ -49,6 +60,7 @@ interface SocketEvents {
   onStockUpdate?: (data: StockUpdatePayload) => void;
   onPurchaseMade?: (data: PurchaseMadePayload) => void;
   onReservationExpired?: (data: ReservationExpiredPayload) => void;
+  onNewDrop?: (data: NewDropPayload) => void;
 }
 
 // hook to listen on socket events, cleans up on unmount
@@ -68,15 +80,20 @@ export function useSocket(events: SocketEvents) {
     const handleReservationExpired = (data: ReservationExpiredPayload) => {
       eventsRef.current.onReservationExpired?.(data);
     };
+    const handleNewDrop = (data: NewDropPayload) => {
+      eventsRef.current.onNewDrop?.(data);
+    };
 
-    socket.on("stock-update", handleStockUpdate);
-    socket.on("purchase-made", handlePurchaseMade);
-    socket.on("reservation-expired", handleReservationExpired);
+    socket.on(SOCKET_EVENTS.INVENTORY_UPDATE, handleStockUpdate);
+    socket.on(SOCKET_EVENTS.PURCHASE_UPDATE, handlePurchaseMade);
+    socket.on(SOCKET_EVENTS.RESERVATION_UPDATE, handleReservationExpired);
+    socket.on(SOCKET_EVENTS.NEW_DROP, handleNewDrop);
 
     return () => {
-      socket.off("stock-update", handleStockUpdate);
-      socket.off("purchase-made", handlePurchaseMade);
-      socket.off("reservation-expired", handleReservationExpired);
+      socket.off(SOCKET_EVENTS.INVENTORY_UPDATE, handleStockUpdate);
+      socket.off(SOCKET_EVENTS.PURCHASE_UPDATE, handlePurchaseMade);
+      socket.off(SOCKET_EVENTS.RESERVATION_UPDATE, handleReservationExpired);
+      socket.off(SOCKET_EVENTS.NEW_DROP, handleNewDrop);
     };
   }, []);
 }

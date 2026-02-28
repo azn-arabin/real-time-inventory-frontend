@@ -29,8 +29,8 @@ export const authApi = {
 
 // drops
 export const dropsApi = {
-  getDrops: (page = 1, limit = 10) =>
-    api.get("/drops", { params: { page, limit } }),
+  getDrops: (page = 1, pageSize = 10) =>
+    api.get("/drops", { params: { page, pageSize } }),
   getDrop: (id: string) => api.get(`/drops/${id}`),
   createDrop: (data: {
     name: string;
