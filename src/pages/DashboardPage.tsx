@@ -64,9 +64,9 @@ export function DashboardPage() {
   useEffect(() => {
     fetchDrops(page);
     fetchMyReservations();
-  }, [fetchDrops, fetchMyReservations]); // eslint-disable-line
+  }, [fetchDrops]); // eslint-disable-line
 
-  // listen to realtime stock + purchase events
+  // listen to realtime socket
   useSocket({
     onStockUpdate: ({ dropId, availableStock }) => {
       setDrops((prev) =>
@@ -84,11 +84,12 @@ export function DashboardPage() {
       });
     },
     onReservationExpired: ({ dropId, userId, availableStock }) => {
-      // update stock count on the card
+      // update stock
       setDrops((prev) =>
         prev.map((d) => (d.id === dropId ? { ...d, availableStock } : d)),
       );
-      // clear that specific reservaton if its the current user's
+
+      // clear the user reservation
       if (user && userId === user.id) {
         setReservations((prev) => {
           const copy = { ...prev };
@@ -98,12 +99,14 @@ export function DashboardPage() {
       }
     },
     onNewDrop: (newDrop) => {
-      // add the new drop to the top of the list in realtime
-      setDrops((prev) => {
-        // dont add duplicate if somehow it already exists
-        if (prev.some((d) => d.id === newDrop.id)) return prev;
-        return [{ ...newDrop, topPurchasers: [] }, ...prev];
-      });
+      // only prepend on page 1
+      if (page === 1) {
+        setDrops((prev) => {
+          if (prev.some((d) => d.id === newDrop.id)) return prev;
+          const updated = [{ ...newDrop, topPurchasers: [] }, ...prev];
+          return updated.slice(0, DROPS_PER_PAGE);
+        });
+      }
       toast.info(`New drop just landed: ${newDrop.name}!`, { duration: 4000 });
     },
   });
@@ -121,7 +124,7 @@ export function DashboardPage() {
     });
   };
 
-  // called when the client side timer hits 0
+  // timer ends
   const handleLocalExpiry = (dropId: string) => {
     setReservations((prev) => {
       const copy = { ...prev };
@@ -132,7 +135,7 @@ export function DashboardPage() {
   };
 
   const handleDropCreated = () => {
-    fetchDrops(1); // go back to first page to see new drop
+    fetchDrops(1); // first page
     toast.success("Drop created!");
   };
 
