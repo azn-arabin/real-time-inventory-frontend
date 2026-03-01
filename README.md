@@ -92,7 +92,7 @@ The app connects to the backend via a single shared Socket.io connection. The `u
 - **`reservation_update`** — handles server-side expiry, clears the users reservation state and updates stock
 - **`new_drop`** — prepends new drops to the list if user is on page 1, shows a toast notification
 
-The key thing here is we **don't refetch the entire drops list** when something changes. Socket events update the specific drop in-place using React state updates, so there's no flickering or reordering of cards. The only time we do a full refetch is when the user manually clicks Refresh or changes pages.
+Socket events update only the affected drop in-place using React state updates, so theres no flickering or card reordering. Full refetch only happens on manual Refresh or page navigation.
 
 ## Project Structure
 
@@ -159,7 +159,7 @@ src/
 
 ## UI Approach
 
-I went with **Tailwind CSS + shadcn/ui** for the component library. shadcn gives you actual source files for each component (not a npm package dependency), so you have full control over the styling and can customize whatever you need. The UI is clean and functional — I focused more on the engineering side (real-time updates, concurrency, state managment) rather then making it pixel-perfect.
+I used **Tailwind CSS + shadcn/ui** for a clean, functional UI and focused on the engineering side (real-time updates, concurrency, state management).
 
 Key UI feedback points:
 

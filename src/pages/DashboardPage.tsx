@@ -69,6 +69,12 @@ export function DashboardPage() {
   // listen to realtime socket
   useSocket({
     onStockUpdate: ({ dropId, availableStock }) => {
+      console.log(
+        "Stock update for drop",
+        dropId,
+        "new stock:",
+        availableStock,
+      );
       setDrops((prev) =>
         prev.map((d) => (d.id === dropId ? { ...d, availableStock } : d)),
       );
@@ -84,6 +90,12 @@ export function DashboardPage() {
       });
     },
     onReservationExpired: ({ dropId, userId, availableStock }) => {
+      console.log(
+        "Reservation expired for drop",
+        dropId,
+        "new stock:",
+        availableStock,
+      );
       // update stock
       setDrops((prev) =>
         prev.map((d) => (d.id === dropId ? { ...d, availableStock } : d)),
